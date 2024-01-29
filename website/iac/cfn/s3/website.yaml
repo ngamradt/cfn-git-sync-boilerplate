@@ -1,0 +1,79 @@
+Description: "Create an encrypted bucket for storing site content. (v1.0.1)"
+Parameters:
+  # General Configuration
+  InfrastructureName:
+    Type: "String"
+    Description: "A name used to differentiate this infrastructure from other existing infrastructure."
+    Default: "main"
+  # Bucket Configuration
+  BucketBaseName:
+    Type: "String"
+    Description: "The bucket base name."
+Resources:
+  Bucket:
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: "Delete"
+    Properties:
+      BucketName: !Sub "${InfrastructureName}-${BucketBaseName}-${AWS::Region}"
+      AccessControl: "PublicRead"
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: "BucketOwnerEnforced"
+      VersioningConfiguration:
+        Status: "Suspended"
+      WebsiteConfiguration:
+        IndexDocument: "index.html"
+        ErrorDocument: "error.html"
+      Tags:
+      - Key: "ManagedBy"
+        Value: "CloudFormation"
+      - Key: "StackName"
+        Value: !Ref "AWS::StackName"
+Outputs:
+  Bucket:
+    Description: "The bucket name."
+    Value: !Ref Bucket
+    Export:
+      Name: !Sub "${AWS::StackName}-Bucket"
+  BucketArn:
+    Description: "The bucket ARN."
+    Value: !GetAtt Bucket.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketArn"
+  BucketDomainName:
+    Description: "The bucket domain name."
+    Value: !GetAtt Bucket.DomainName
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketDomainName"
+  BucketDualStackDomainName:
+    Description: "The bucket dual-stack domain name."
+    Value: !GetAtt Bucket.DualStackDomainName
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketDualStackDomainName"
+  BucketRegionalDomainName:
+    Description: "The bucket regional domain name."
+    Value: !GetAtt Bucket.RegionalDomainName
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketRegionalDomainName"
+  BucketWebsiteUrl:
+    Description: "The bucket website URL."
+    Value: !GetAtt Bucket.WebsiteURL
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketWebsiteUrl"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: "General Configuration"
+      Parameters:
+      - InfrastructureName
+    - Label:
+        default: "Bucket Configuration"
+      Parameters:
+      - BucketBaseName
+    ParameterLabels:
+      # General Configuration
+      InfrastructureName:
+        default: "Infrastructure Name:"
+      BucketBaseName:
+        default: "Bucket Base Name:"

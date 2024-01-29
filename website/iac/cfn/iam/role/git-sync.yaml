@@ -1,0 +1,98 @@
+Description: "Create a CloudFormation Git Sync Role (v1.0.0)"
+Parameters:
+  # General Configuration
+  SuggestedStackName:
+    Type: "String"
+    Description: "If creating through the AWS Console, this is the suggested stack name.  Copy and paste this value for the stack name."
+    Default: "WebsiteGitSyncRole"
+  RoleBaseName:
+    Type: "String"
+    Description: "The base name for the role that we are creating."
+    Default: "website-git-sync"
+Resources:
+  GitSyncRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Sub "${RoleBaseName}-${AWS::Region}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Principal:
+            Service:
+            - "cloudformation.sync.codeconnections.amazonaws.com"
+          Action:
+          - "sts:AssumeRole"
+      Policies:
+      - PolicyName: "SetupServiceRole"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+            - "cloudformation:CreateChangeSet"
+            - "cloudformation:DeleteChangeSet"
+            - "cloudformation:DescribeChangeSet"
+            - "cloudformation:DescribeStackEvents"
+            - "cloudformation:DescribeStacks"
+            - "cloudformation:ExecuteChangeSet"
+            - "cloudformation:GetTemplate"
+            - "cloudformation:ListChangeSets"
+            - "cloudformation:ListStacks"
+            - "cloudformation:ValidateTemplate"
+            Resource: "*"
+            Sid: "SyncToCloudFormation"
+          - Effect: "Allow"
+            Action:
+            - "events:PutRule"
+            - "events:PutTargets"
+            Condition:
+              StringEquals:
+                events:ManagedBy:
+                - "cloudformation.sync.codeconnections.amazonaws.com"
+            Resource: "*"
+            Sid: "PolicyForManagedRules"
+          - Effect: "Allow"
+            Action:
+            - "events:DescribeRule"
+            Resource: "*"
+            Sid: "PolicyForDescribingRule"
+          - Effect: "Allow"
+            Action:
+            - "s3:*"
+            Condition:
+              ForAnyValue:StringEquals:
+                aws:CalledVia:
+                - "cloudformation.amazonaws.com"
+            Resource: "*"
+            Sid: "CreateS3Bucket"
+      Tags:
+      - Key: "ManagedBy"
+        Value: "CloudFormation"
+      - Key: "StackName"
+        Value: !Ref "AWS::StackName"
+Outputs:
+  GitSyncRoleName:
+    Description: "The role name."
+    Value: !Ref GitSyncRole
+    Export:
+      Name: !Sub "${AWS::StackName}-GitSyncRoleName"
+  GitSyncRoleArn:
+    Description: "The role ARN."
+    Value: !GetAtt GitSyncRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-GitSyncRoleName"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: "General Configuration"
+      Parameters:
+      - SuggestedStackName
+      - RoleBaseName
+    ParameterLabels:
+      # General Configuration
+      SuggestedStackName:
+        default: "Suggested Stack Name:"
+      RoleBaseName:
+        default: "Role Base Name:"

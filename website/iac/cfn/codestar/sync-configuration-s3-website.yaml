@@ -1,0 +1,42 @@
+Description: "Create a CodeStar Sync Configuration for the S3 Website (v1.0.0)"
+Parameters:
+  # General Configuration
+  BranchName:
+    Type: "String"
+    Description: "The name of the Git branch to use."
+    Default: "main"
+  ConfigFile:
+    Type: "String"
+    Description: "The relative path and name of deployment configuration file."
+    Default: "./website/deployment/s3/website.yaml"
+  ResourceName:
+    Type: "String"
+    Description: "The name to give this configuration."
+    Default: "sync-configuration-s3-website"
+Resources:
+  GitHubSyncConfiguration:
+    Type: "AWS::CodeStarConnections::SyncConfiguration"
+    Properties:
+      RepositoryLinkId: !ImportValue "WebsiteGitSyncConnection-GitHubRepositoryLinkId" #From connection.yaml
+      RoleArn: !ImportValue "WebsiteGitSyncRole-GitSyncRoleArn" #From git-sync.yaml
+      Branch: !Ref BranchName
+      ConfigFile: !Ref ConfigFile
+      ResourceName: !Ref ResourceName
+      SyncType: "CFN_STACK_SYNC"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: "General Configuration"
+      Parameters:
+      - BranchName
+      - ConfigFile
+      - ResourceName
+    ParameterLabels:
+      # General Configuration
+      BranchName:
+        default: "Git Branch Name:"
+      ConfigFile:
+        default: "Config File Name:"
+      ResourceName:
+        default: "Resource Name:"

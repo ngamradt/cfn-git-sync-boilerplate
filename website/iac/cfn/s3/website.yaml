@@ -34,17 +34,17 @@ Resources:
         Value: "CloudFormation"
       - Key: "StackName"
         Value: !Ref "AWS::StackName"
-  BucketPolicy:
-    Type: "AWS::S3::BucketPolicy"
-    Properties:
-      Bucket: !Ref Bucket
-      PolicyDocument:
-        Statement:
-        - Sid: "PublicReadGetObject"
-          Effect: "Allow"
-          Principal: "*"
-          Action: "s3:GetObject"
-          Resource: !Sub "arn:aws:s3:::${Bucket}/*"
+  # BucketPolicy:
+  #   Type: "AWS::S3::BucketPolicy"
+  #   Properties:
+  #     Bucket: !Ref Bucket
+  #     PolicyDocument:
+  #       Statement:
+  #       - Sid: "PublicReadGetObject"
+  #         Effect: "Allow"
+  #         Principal: "*"
+  #         Action: "s3:GetObject"
+  #         Resource: !Sub "arn:aws:s3:::${Bucket}/*"
 Outputs:
   Bucket:
     Description: "The bucket name."

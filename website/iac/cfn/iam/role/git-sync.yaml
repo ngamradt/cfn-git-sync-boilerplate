@@ -81,7 +81,7 @@ Outputs:
     Description: "The role ARN."
     Value: !GetAtt GitSyncRole.Arn
     Export:
-      Name: !Sub "${AWS::StackName}-GitSyncRoleName"
+      Name: !Sub "${AWS::StackName}-GitSyncRoleArn"
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

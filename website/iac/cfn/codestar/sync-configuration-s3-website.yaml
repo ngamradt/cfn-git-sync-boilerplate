@@ -1,6 +1,10 @@
 Description: "Create a CodeStar Sync Configuration for the S3 Website (v1.0.0)"
 Parameters:
   # General Configuration
+  SuggestedStackName:
+    Type: "String"
+    Description: "If creating through the AWS Console, this is the suggested stack name.  Copy and paste this value for the stack name."
+    Default: "WebsiteGitSyncConfiguration"
   BranchName:
     Type: "String"
     Description: "The name of the Git branch to use."
@@ -8,7 +12,7 @@ Parameters:
   ConfigFile:
     Type: "String"
     Description: "The relative path and name of deployment configuration file."
-    Default: "./website/deployment/s3/website.yaml"
+    Default: "/website/deployment/s3/website.yaml"
   ResourceName:
     Type: "String"
     Description: "The name to give this configuration."
@@ -29,11 +33,14 @@ Metadata:
     - Label:
         default: "General Configuration"
       Parameters:
+      - SuggestedStackName
       - BranchName
       - ConfigFile
       - ResourceName
     ParameterLabels:
       # General Configuration
+      SuggestedStackName:
+        default: "Suggested Stack Name:"
       BranchName:
         default: "Git Branch Name:"
       ConfigFile:

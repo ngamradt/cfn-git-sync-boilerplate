@@ -19,6 +19,11 @@ Resources:
       OwnershipControls:
         Rules:
         - ObjectOwnership: "BucketOwnerPreferred"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
       VersioningConfiguration:
         Status: "Suspended"
       WebsiteConfiguration:

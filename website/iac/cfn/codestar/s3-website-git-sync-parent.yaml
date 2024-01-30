@@ -1,0 +1,20 @@
+Description: "Parent Stack for S3 Website Template Git Sync Configuration (v1.0.0)"
+Parameters:
+  SuggestedStackName:
+    Type: "String"
+    Description: "If creating through the AWS Console, this is the suggested stack name.  Copy and paste this value for the stack name."
+    Default: "WebsiteGitSync"
+Resources:
+  GitSyncSetupWaitCondition:
+    Type: "AWS::CloudFormation::WaitConditionHandle"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: "General Configuration"
+      Parameters:
+      - SuggestedStackName
+    ParameterLabels:
+      # General Configuration
+      SuggestedStackName:
+        default: "Suggested Stack Name:"

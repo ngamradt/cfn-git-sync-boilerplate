@@ -20,6 +20,7 @@ Resources:
         - Effect: "Allow"
           Principal:
             Service:
+            - "cloudformation.amazonaws.com" #Need to determine if this is really required.
             - "cloudformation.sync.codeconnections.amazonaws.com"
           Action:
           - "sts:AssumeRole"

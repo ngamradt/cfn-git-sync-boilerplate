@@ -15,8 +15,8 @@ Parameters:
     Default: "/website/deployment/s3/website.yaml"
   ResourceName:
     Type: "String"
-    Description: "The name to give this configuration."
-    Default: "sync-configuration-s3-website"
+    Description: "The name of the parent stack."
+    Default: "WebsiteGitSync" #Must match the name of the parent template stack.
 Resources:
   GitHubSyncConfiguration:
     Type: "AWS::CodeStarConnections::SyncConfiguration"
@@ -27,6 +27,12 @@ Resources:
       ConfigFile: !Ref ConfigFile
       ResourceName: !Ref ResourceName
       SyncType: "CFN_STACK_SYNC"
+Outputs:
+  GitHubSyncConfigurationArn:
+    Description: "The Git Sync Configuration ARN."
+    Value: !Ref GitHubSyncConfiguration
+    Export:
+      Name: !Sub "${AWS::StackName}-GitHubSyncConfigurationArn"
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

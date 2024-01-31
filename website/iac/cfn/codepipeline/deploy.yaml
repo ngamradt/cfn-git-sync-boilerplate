@@ -1,4 +1,4 @@
-Description: "Create a CodePipeline for deploying static files - (v1.0.0)"
+Description: "Create a CodePipeline for deploying static files - (v1.0.1)"
 Parameters:
   # General Configuration
   InfrastructureName:
@@ -143,7 +143,7 @@ Resources:
             Provider: "CodeStarSourceConnection"
             Version: "1"
           Configuration:
-            ConnectionArn: !ImportValue WebsiteGitSyncConnection--GitHubConnectionArn
+            ConnectionArn: !ImportValue WebsiteGitSyncConnection-GitHubConnectionArn
             FullRepositoryId: !Sub "${OwnerId}/${RepositoryName}" #Need to set this.
             BranchName: !Ref BranchName
             OutputArtifactFormat: "CODE_ZIP"

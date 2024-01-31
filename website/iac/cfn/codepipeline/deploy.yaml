@@ -140,7 +140,7 @@ Resources:
       - Name: "Source"
         Actions:
         - Name: "Website_Source"
-          Namespace: "JamstackWebsite"
+          Namespace: "StaticWebsite"
           ActionTypeId:
             Category: "Source"
             Owner: "AWS"

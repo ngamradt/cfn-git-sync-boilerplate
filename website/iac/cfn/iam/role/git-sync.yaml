@@ -1,4 +1,4 @@
-Description: "Create a CloudFormation Git Sync Role (v1.1.0)"
+Description: "Create a CloudFormation Git Sync Role (v1.2.0)"
 Parameters:
   # General Configuration
   SuggestedStackName:
@@ -31,36 +31,13 @@ Resources:
           Statement:
           - Effect: "Allow"
             Action:
-            - "cloudformation:CreateChangeSet"
-            - "cloudformation:DeleteChangeSet"
-            - "cloudformation:DescribeChangeSet"
-            - "cloudformation:DescribeStackEvents"
-            - "cloudformation:DescribeStacks"
-            - "cloudformation:ExecuteChangeSet"
-            - "cloudformation:GetTemplate"
-            - "cloudformation:ListChangeSets"
-            - "cloudformation:ListStacks"
-            - "cloudformation:ValidateTemplate"
+            - "events:*"
             Resource: "*"
-            Sid: "SyncToCloudFormation"
-          - Effect: "Allow"
-            Action:
-            - "events:PutRule"
-            - "events:PutTargets"
-            Condition:
-              StringEquals:
-                events:ManagedBy:
-                - "cloudformation.sync.codeconnections.amazonaws.com"
-            Resource: "*"
-            Sid: "PolicyForManagedRules"
-          - Effect: "Allow"
-            Action:
-            - "events:DescribeRule"
-            Resource: "*"
-            Sid: "PolicyForDescribingRule"
       ManagedPolicyArns:
       - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      - "arn:aws:iam::aws:policy/AWSCloudFormationFullAccess"
       - "arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess"
+      - "arn:aws:iam::aws:policy/IAMFullAccess"
       Tags:
       - Key: "ManagedBy"
         Value: "CloudFormation"

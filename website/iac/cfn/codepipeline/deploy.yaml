@@ -1,0 +1,194 @@
+Description: "Create a CodePipeline for deploying static files - (v1.0.0)"
+Parameters:
+  # General Configuration
+  InfrastructureName:
+    Type: "String"
+    Description: "A name used to differentiate this infrastructure from other existing infrastructure."
+    Default: "main"
+  # Bucket Configuration
+  BucketBaseName:
+    Type: "String"
+    Description: "The bucket base name."
+  BranchName:
+    Type: "String"
+    Description: "The name of the Git branch to use."
+    Default: "main"
+  OwnerId:
+    Type: "String"
+    Description: "The GitHub Owner ID."
+    Default: "ngamradt"
+  RepositoryName:
+    Type: "String"
+    Description: "The name of the GitHub repository."
+    Default: "cfn-git-sync-boilerplate"
+  CacheControl:
+    Type: "String"
+    Description: "The Cache-Control header value applied to files coming from the build process."
+    Default: "max-age=120, public"
+
+Conditions:
+  CacheControl: !Not [ !Equals [ !Ref CacheControl, "" ] ]
+
+Resources:
+  # Create a simple S3 bucket that the CodePipeline will use for storing artifacts between stages.
+  CodePipelineBucket:
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: "Delete"
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: "AES256"
+      LifecycleConfiguration:
+        Rules:
+        # TODO: Look into having this bucket clear out completely every so often.
+        - Id: "DefaultObjectMaxAge"
+          Prefix: ""
+          Status: "Enabled"
+          AbortIncompleteMultipartUpload:
+            DaysAfterInitiation: "27"
+          ExpirationInDays: "27"
+          NoncurrentVersionExpirationInDays: "27"
+      PublicAccessBlockConfiguration:
+        # Block public access to buckets and objects granted through new access control lists (ACLs)
+        BlockPublicAcls: true
+        # Block public access to buckets and objects granted through any access control lists (ACLs)
+        IgnorePublicAcls: true
+        # Block public access to buckets and objects granted through new public bucket or access point policies
+        BlockPublicPolicy: true
+        # Block public and cross-account access to buckets and objects through any public bucket or access point policies
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: "Suspended"
+      Tags:
+      - Key: "StackName"
+        Value: !Ref "AWS::StackName"
+
+  # Create a role that the CodePipeline can use for deploying resources.
+  CodePipelineRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Principal:
+            Service:
+            - "codepipeline.amazonaws.com"
+          Action:
+          - "sts:AssumeRole"
+      Policies:
+      - PolicyName: "SetupServiceRole"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+            - "events:*"
+            Resource: "*"
+          # These IAM actions are needed for CodePipeline to successfully pass IAM roles to stage actions, etc.
+          - Effect: "Allow"
+            Action:
+            - "iam:AttachRolePolicy"
+            - "iam:CreateRole"
+            - "iam:CreateServiceLinkedRole"
+            - "iam:DeleteRole"
+            - "iam:DeleteRolePermissionsBoundary"
+            - "iam:DeleteRolePolicy"
+            - "iam:DeleteServiceLinkedRole"
+            - "iam:DetachRolePolicy"
+            - "iam:GetRole"
+            - "iam:GetRolePolicy"
+            - "iam:GetServiceLinkedRoleDeletionStatus"
+            - "iam:ListAttachedRolePolicies"
+            - "iam:ListInstanceProfilesForRole"
+            - "iam:ListRolePolicies"
+            - "iam:ListRoleTags"
+            - "iam:PassRole"
+            - "iam:PutRolePermissionsBoundary"
+            - "iam:PutRolePolicy"
+            - "iam:TagRole"
+            - "iam:UntagRole"
+            - "iam:UpdateAssumeRolePolicy"
+            - "iam:UpdateRole"
+            - "iam:UpdateRoleDescription"
+            Resource: "*"
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      Tags:
+      - Key: "StackName"
+        Value: !Ref "AWS::StackName"
+
+  CodePipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      Name: "Static"
+      RestartExecutionOnUpdate: true
+      ArtifactStores:
+      - Region: !Ref "AWS::Region"
+        ArtifactStore:
+          Type: "S3"
+          Location: !Ref CodePipelineBucket
+      Stages:
+      # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
+      - Name: "Source"
+        Actions:
+        - Name: "Jamstack_Website_Source"
+          Namespace: "JamstackWebsite"
+          ActionTypeId:
+            Category: "Source"
+            Owner: "AWS"
+            Provider: "CodeStarSourceConnection"
+            Version: "1"
+          Configuration:
+            ConnectionArn: !ImportValue WebsiteGitSyncConnection--GitHubConnectionArn
+            FullRepositoryId: !Sub "${OwnerId}/${RepositoryName}" #Need to set this.
+            BranchName: !Ref BranchName
+            OutputArtifactFormat: "CODE_ZIP"
+          OutputArtifacts:
+          - Name: "WEBSITE_SOURCE_FILES"
+          RunOrder: 1
+      - Name: "Deployment"
+        Actions:
+        - Name: "Files_to_S3"
+          ActionTypeId:
+            Category: "Deploy"
+            Owner: "AWS"
+            Provider: "S3"
+            Version: "1"
+          Configuration: # Update this entire configuration session.
+            BucketName: !Sub "${InfrastructureName}-${BucketBaseName}-${AWS::Region}"
+            CacheControl: !If [ CacheControl, !Ref CacheControl, !Ref "AWS::NoValue" ]
+            Extract: true
+          InputArtifacts:
+          - Name: "WEBSITE_SOURCE_FILES"
+          RunOrder: 2
+          Region: !Ref "AWS::Region"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: "General Configuration"
+      Parameters:
+      - InfrastructureName
+      - BucketBaseName
+      - BranchName
+      - OwnerId
+      - RepositoryName
+      - CacheControl
+    ParameterLabels:
+      # General Configuration
+      InfrastructureName:
+        default: "Infrastructure Name:"
+      BucketBaseName:
+        default: "Bucket Base Name:"
+      BranchName:
+        default: "Branch Name:"
+      OwnerId:
+        default: "Owner ID:"
+      RepositoryName:
+        default: "Repository Name:"
+      CacheControl:
+        default: "Cache Control:"

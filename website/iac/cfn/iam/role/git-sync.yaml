@@ -1,4 +1,4 @@
-Description: "Create a CloudFormation Git Sync Role (v1.0.0)"
+Description: "Create a CloudFormation Git Sync Role (v1.1.0)"
 Parameters:
   # General Configuration
   SuggestedStackName:
@@ -58,15 +58,9 @@ Resources:
             - "events:DescribeRule"
             Resource: "*"
             Sid: "PolicyForDescribingRule"
-          - Effect: "Allow"
-            Action:
-            - "s3:*"
-            Condition:
-              ForAnyValue:StringEquals:
-                aws:CalledVia:
-                - "cloudformation.amazonaws.com"
-            Resource: "*"
-            Sid: "CreateS3Bucket"
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      - "arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess"
       Tags:
       - Key: "ManagedBy"
         Value: "CloudFormation"

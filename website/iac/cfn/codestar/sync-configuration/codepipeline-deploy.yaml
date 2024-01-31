@@ -1,0 +1,55 @@
+Description: "Create a CodeStar Sync Configuration for the Deploy Codepipeline (v1.0.0)"
+Parameters:
+  # General Configuration
+  SuggestedStackName:
+    Type: "String"
+    Description: "If creating through the AWS Console, this is the suggested stack name.  Copy and paste this value for the stack name."
+    Default: "CodepipelineGitSyncConfiguration"
+  BranchName:
+    Type: "String"
+    Description: "The name of the Git branch to use."
+    Default: "main"
+  ConfigFile:
+    Type: "String"
+    Description: "The relative path and name of deployment configuration file."
+    Default: "./website/deployment/codepipeline/deploy.yaml"
+  ResourceName:
+    Type: "String"
+    Description: "The name of the parent stack."
+    Default: "CodepipelineDeploy" #Must match the name of the parent template stack.
+Resources:
+  GitHubSyncConfiguration:
+    Type: "AWS::CodeStarConnections::SyncConfiguration"
+    Properties:
+      RepositoryLinkId: !ImportValue "WebsiteGitSyncConnection-GitHubRepositoryLinkId" #From connection.yaml
+      RoleArn: !ImportValue "WebsiteGitSyncRole-GitSyncRoleArn" #From git-sync.yaml
+      Branch: !Ref BranchName
+      ConfigFile: !Ref ConfigFile
+      ResourceName: !Ref ResourceName
+      SyncType: "CFN_STACK_SYNC"
+Outputs:
+  GitHubSyncConfigurationArn:
+    Description: "The Git Sync Configuration ARN."
+    Value: !Ref GitHubSyncConfiguration
+    Export:
+      Name: !Sub "${AWS::StackName}-GitHubSyncConfigurationArn"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: "General Configuration"
+      Parameters:
+      - SuggestedStackName
+      - BranchName
+      - ConfigFile
+      - ResourceName
+    ParameterLabels:
+      # General Configuration
+      SuggestedStackName:
+        default: "Suggested Stack Name:"
+      BranchName:
+        default: "Git Branch Name:"
+      ConfigFile:
+        default: "Config File Name:"
+      ResourceName:
+        default: "Resource Name:"

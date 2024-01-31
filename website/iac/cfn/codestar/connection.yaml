@@ -1,4 +1,4 @@
-Description: "Create a CodeStar Connection to GitHub (v1.0.0)"
+Description: "Create a CodeStar Connection to GitHub (v1.1.0)"
 Parameters:
   # General Configuration
   SuggestedStackName:
@@ -38,6 +38,11 @@ Resources:
       - Key: "StackName"
         Value: !Ref "AWS::StackName"
 Outputs:
+  GitHubConnectionArn:
+    Description: "The CodeStar Connection ARN."
+    Value: !Ref GitHubConnection
+    Export:
+      Name: !Sub "${AWS::StackName}-GitHubConnectionArn"
   GitHubRepositoryLinkArn:
     Description: "The GitHub Repository Link ARN."
     Value: !Ref GitHubRepositoryLink

@@ -1,4 +1,34 @@
 Description: "Create a CodePipeline for deploying static files - (v1.0.0)"
+Parameters:
+  # General Configuration
+  InfrastructureName:
+    Type: "String"
+    Description: "A name used to differentiate this infrastructure from other existing infrastructure."
+    Default: "main"
+  # Bucket Configuration
+  BucketBaseName:
+    Type: "String"
+    Description: "The bucket base name."
+  BranchName:
+    Type: "String"
+    Description: "The name of the Git branch to use."
+    Default: "main"
+  OwnerId:
+    Type: "String"
+    Description: "The GitHub Owner ID."
+    Default: "ngamradt"
+  RepositoryName:
+    Type: "String"
+    Description: "The name of the GitHub repository."
+    Default: "cfn-git-sync-boilerplate"
+  CacheControl:
+    Type: "String"
+    Description: "The Cache-Control header value applied to files coming from the build process."
+    Default: "max-age=120, public"
+
+Conditions:
+  CacheControl: !Not [ !Equals [ !Ref CacheControl, "" ] ]
+
 Resources:
   # Create a simple S3 bucket that the CodePipeline will use for storing artifacts between stages.
   CodePipelineBucket:
@@ -113,9 +143,9 @@ Resources:
             Provider: "CodeStarSourceConnection"
             Version: "1"
           Configuration:
-            ConnectionArn: "arn:aws:codestar-connections:region:account-id:connection/connection-id" #Need to set this.
-            FullRepositoryId: "ngamradt/cfn-git-sync-boilerplate" #Need to set this.
-            BranchName: "main"
+            ConnectionArn: !ImportValue WebsiteGitSyncConnection--GitHubConnectionArn
+            FullRepositoryId: !Sub "${OwnerId}/${RepositoryName}" #Need to set this.
+            BranchName: !Ref BranchName
             OutputArtifactFormat: "CODE_ZIP"
           OutputArtifacts:
           - Name: "WEBSITE_SOURCE_FILES"
@@ -129,11 +159,36 @@ Resources:
             Provider: "S3"
             Version: "1"
           Configuration: # Update this entire configuration session.
-            BucketName: !Sub "${InfrastructureName}-${ProductName}-site-${AWS::Region}"
-            CacheControl: !If [ BuildFileCacheControl, !Ref BuildFileCacheControl, !Ref "AWS::NoValue" ]
+            BucketName: !Sub "${InfrastructureName}-${BucketBaseName}-${AWS::Region}"
+            CacheControl: !If [ CacheControl, !Ref CacheControl, !Ref "AWS::NoValue" ]
             Extract: true
-            ObjectKey: !If [ DynamicContentBasePath, !Ref DynamicContentBasePath, !Ref "AWS::NoValue" ]
           InputArtifacts:
           - Name: "WEBSITE_SOURCE_FILES"
           RunOrder: 2
           Region: !Ref "AWS::Region"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: "General Configuration"
+      Parameters:
+      - InfrastructureName
+      - BucketBaseName
+      - BranchName
+      - OwnerId
+      - RepositoryName
+      - CacheControl
+    ParameterLabels:
+      # General Configuration
+      InfrastructureName:
+        default: "Infrastructure Name:"
+      BucketBaseName:
+        default: "Bucket Base Name:"
+      BranchName:
+        default: "Branch Name:"
+      OwnerId:
+        default: "Owner ID:"
+      RepositoryName:
+        default: "Repository Name:"
+      CacheControl:
+        default: "Cache Control:"

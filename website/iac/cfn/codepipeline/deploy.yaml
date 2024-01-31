@@ -87,6 +87,10 @@ Resources:
             Action:
             - "events:*"
             Resource: "*"
+          - Effect: "Allow"
+            Action:
+            - "codestar-connections:UseConnection"
+            Resource: "*"
           # These IAM actions are needed for CodePipeline to successfully pass IAM roles to stage actions, etc.
           - Effect: "Allow"
             Action:
@@ -120,52 +124,52 @@ Resources:
       - Key: "StackName"
         Value: !Ref "AWS::StackName"
 
-  # CodePipeline:
-  #   Type: "AWS::CodePipeline::Pipeline"
-  #   Properties:
-  #     RoleArn: !GetAtt CodePipelineRole.Arn
-  #     Name: "Static"
-  #     RestartExecutionOnUpdate: true
-  #     ArtifactStores:
-  #     - Region: !Ref "AWS::Region"
-  #       ArtifactStore:
-  #         Type: "S3"
-  #         Location: !Ref CodePipelineBucket
-  #     Stages:
-  #     # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
-  #     - Name: "Source"
-  #       Actions:
-  #       - Name: "Jamstack_Website_Source"
-  #         Namespace: "JamstackWebsite"
-  #         ActionTypeId:
-  #           Category: "Source"
-  #           Owner: "AWS"
-  #           Provider: "CodeStarSourceConnection"
-  #           Version: "1"
-  #         Configuration:
-  #           ConnectionArn: !ImportValue WebsiteGitSyncConnection-GitHubConnectionArn
-  #           FullRepositoryId: !Sub "${OwnerId}/${RepositoryName}" #Need to set this.
-  #           BranchName: !Ref BranchName
-  #           OutputArtifactFormat: "CODE_ZIP"
-  #         OutputArtifacts:
-  #         - Name: "WEBSITE_SOURCE_FILES"
-  #         RunOrder: 1
-  #     - Name: "Deployment"
-  #       Actions:
-  #       - Name: "Files_to_S3"
-  #         ActionTypeId:
-  #           Category: "Deploy"
-  #           Owner: "AWS"
-  #           Provider: "S3"
-  #           Version: "1"
-  #         Configuration: # Update this entire configuration session.
-  #           BucketName: !Sub "${InfrastructureName}-${BucketBaseName}-${AWS::Region}"
-  #           CacheControl: !If [ CacheControl, !Ref CacheControl, !Ref "AWS::NoValue" ]
-  #           Extract: true
-  #         InputArtifacts:
-  #         - Name: "WEBSITE_SOURCE_FILES"
-  #         RunOrder: 2
-  #         Region: !Ref "AWS::Region"
+  CodePipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      Name: "Static"
+      RestartExecutionOnUpdate: true
+      ArtifactStores:
+      - Region: !Ref "AWS::Region"
+        ArtifactStore:
+          Type: "S3"
+          Location: !Ref CodePipelineBucket
+      Stages:
+      # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
+      - Name: "Source"
+        Actions:
+        - Name: "Website_Source"
+          Namespace: "JamstackWebsite"
+          ActionTypeId:
+            Category: "Source"
+            Owner: "AWS"
+            Provider: "CodeStarSourceConnection"
+            Version: "1"
+          Configuration:
+            ConnectionArn: !ImportValue WebsiteGitSyncConnection-GitHubConnectionArn
+            FullRepositoryId: !Sub "${OwnerId}/${RepositoryName}" #Need to set this.
+            BranchName: !Ref BranchName
+            OutputArtifactFormat: "CODE_ZIP"
+          OutputArtifacts:
+          - Name: "WEBSITE_SOURCE_FILES"
+          RunOrder: 1
+      - Name: "Deployment"
+        Actions:
+        - Name: "Files_to_S3"
+          ActionTypeId:
+            Category: "Deploy"
+            Owner: "AWS"
+            Provider: "S3"
+            Version: "1"
+          Configuration: # Update this entire configuration session.
+            BucketName: !Sub "${InfrastructureName}-${BucketBaseName}-${AWS::Region}"
+            CacheControl: !If [ CacheControl, !Ref CacheControl, !Ref "AWS::NoValue" ]
+            Extract: true
+          InputArtifacts:
+          - Name: "WEBSITE_SOURCE_FILES"
+          RunOrder: 1
+          Region: !Ref "AWS::Region"
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

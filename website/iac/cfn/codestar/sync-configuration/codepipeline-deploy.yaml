@@ -12,7 +12,7 @@ Parameters:
   ConfigFile:
     Type: "String"
     Description: "The relative path and name of deployment configuration file."
-    Default: "./website/deployment/codepipeline/deploy.yaml"
+    Default: "/website/deployment/codepipeline/deploy.yaml"
   ResourceName:
     Type: "String"
     Description: "The name of the parent stack."

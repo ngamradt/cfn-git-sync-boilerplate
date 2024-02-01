@@ -5,11 +5,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Simple Example Site</title>
+  <title>CloudFormation Git Sync Example</title>
   <meta name="description" content="Simple example page.">
   <meta name="author" content="Neal Gamradt">
 
-  <meta property="og:title" content="Simple Example Site">
+  <meta property="og:title" content="CloudFormation Git Sync Example">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://example.com">
   <meta property="og:description" content="Simple example page.">
@@ -40,13 +40,18 @@
       padding: 0px 20px 0px 20px;
     }
 
+    h3 {
+      text-align: left;
+      padding: 0px 20px 0px 20px;
+    }
+
     p {
       padding: 0px 20px 0px 20px;
     }
 
     figure {
       float: left;
-      margin: 0px 20px 0px 20px;
+      margin: 0px 20px 0px 100px;
     }
 
     figcaption {
@@ -120,17 +125,51 @@
   <div class="container">
     <header>
 
-      <h1>Simple Example Site</h1>
+      <h1>CloudFormation Git Sync Example</h1>
 
     </header>
     <main>
 
       <h2>Welcome</h2>
 
-      <p>This is a sample website using an S3 bucket.</p>
+      <p>This is a simple website that was created using CloudFormation templates in conjuction with the new <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/git-sync-concepts-terms.html?icmpid=docs_console_unmapped#git-sync-terms-depoyment-file">CloudFormation Git Sync feature</a>.</p>
+
+      <p>Review the <a href="https://github.com/ngamradt/cfn-git-sync-boilerplate">Boilerplate GitHub repository</a> to see how this site was created.</p>
+
+      <p>Visit <a href="https://nealgamradt.com">my blog</a> to find out about other things I have created, etc.</p>
+
+      <h3>Initial Setup Files</h3>
+      <ol>
+        <li><a href="/website/iac/cfn/iam/role/git-sync.yaml">/website/iac/cfn/iam/role/git-sync.yaml</a></li>
+        <li><a href="/website/iac/cfn/codestar/connection.yaml">/website/iac/cfn/codestar/connection.yaml</a></li>
+      </ol>
+
+      <h3>Parent Placeholder Files</h3>
+      <ol>
+        <li><a href="/website/iac/cfn/codestar/parent/s3-website-git-sync.yaml">/website/iac/cfn/codestar/parent/s3-website-git-sync.yaml</a></li>
+        <li><a href="/website/iac/cfn/codestar/parent/codepipeline-deploy-git-sync.yaml">/website/iac/cfn/codestar/parent/codepipeline-deploy-git-sync.yaml</a></li>
+      </ol>
+
+      <h3>Sync Configuration Files</h3>
+      <ol>
+        <li><a href="/website/iac/cfn/codestar/sync-configuration/s3-website.yaml">/website/iac/cfn/codestar/sync-configuration/s3-website.yaml</a></li>
+        <li><a href="/website/iac/cfn/codestar/sync-configuration/codepipeline-deploy.yaml">/website/iac/cfn/codestar/sync-configuration/codepipeline-deploy.yaml</a></li>
+      </ol>
+
+      <h3>Stack Deployment Files</h3>
+      <ol>
+        <li><a href="/website/deployment/codepipeline/deploy.yaml">/website/deployment/codepipeline/deploy.yaml</a></li>
+        <li><a href="/website/deployment/s3/website.yaml">/website/deployment/s3/website.yaml</a></li>
+      </ol>
+
+      <h3>Infrastructure Files</h3>
+      <ol>
+        <li><a href="/website/iac/cfn/s3/website.yaml">/website/iac/cfn/s3/website.yaml</a></li>
+        <li><a href="/website/iac/cfn/codepipeline/deploy.yaml">/website/iac/cfn/codepipeline/deploy.yaml</a></li>
+      </ol>
 
       <figure>
-        <img src="http://placekitten.com/300/300">
+        <img src="http://placekitten.com/600/600">
         <figcaption>Random Picture of a Kitten</figcaption>
       </figure>
 

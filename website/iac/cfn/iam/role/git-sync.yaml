@@ -10,6 +10,7 @@ Parameters:
     Description: "The base name for the role that we are creating."
     Default: "website-git-sync"
 Resources:
+  # TODO: Need to clean up these permissions, I was running into a bug with CodePipeline and I changed some of these permissions while troubleshooting.
   GitSyncRole:
     Type: "AWS::IAM::Role"
     Properties:

@@ -1,4 +1,4 @@
-Description: "Create an encrypted bucket for storing site content. (v1.0.1)"
+Description: "Create a bucket for storing site content. (v1.0.1)"
 Parameters:
   # General Configuration
   InfrastructureName:

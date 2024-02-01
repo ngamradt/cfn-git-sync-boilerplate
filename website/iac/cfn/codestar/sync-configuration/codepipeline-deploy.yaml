@@ -16,7 +16,7 @@ Parameters:
   ResourceName:
     Type: "String"
     Description: "The name of the parent stack."
-    Default: "CodepipelineDeploy" #Must match the name of the parent template stack.
+    Default: "CodepipelineDeployGitSync" #Must match the name of the parent template stack.
 Resources:
   GitHubSyncConfiguration:
     Type: "AWS::CodeStarConnections::SyncConfiguration"

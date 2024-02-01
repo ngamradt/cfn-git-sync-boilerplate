@@ -3,7 +3,7 @@ Parameters:
   SuggestedStackName:
     Type: "String"
     Description: "If creating through the AWS Console, this is the suggested stack name.  Copy and paste this value for the stack name."
-    Default: "CodepipelineDeploy"
+    Default: "CodepipelineDeployGitSync"
 Resources:
   GitSyncSetupWaitCondition:
     Type: "AWS::CloudFormation::WaitConditionHandle"

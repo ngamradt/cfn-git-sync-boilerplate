@@ -4,7 +4,9 @@
 
 This project uses CloudFormation templates to set up the new [CloudFormation Git Sync](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/git-sync-concepts-terms.html?icmpid=docs_console_unmapped#git-sync-terms-depoyment-file) feature for an S3 bucket (with web hosting enabled) and a simple CodePipeline deployment.
 
-One of the goals of this project is to leverage Infrastructure as Code (IaC) as much as possible, so any process that can be done in CloudFormation is done in CloudFormation.
+One of the goals of this project is to leverage [Infrastructure as Code (IaC)](https://en.wikipedia.org/wiki/Infrastructure_as_code) as much as possible, so any process that can be done in CloudFormation is done in CloudFormation.
+
+For more details, please see my [related blog post](https://nealgamradt.com/posts/2024/02/aws-cloudformation-git-sync/index.html) and [YouTube video](https://youtu.be/u9xsfUCoFS8?si=eZT-oxPOnuSKf49b&t=0).
 
 ## Synopsis
 
@@ -17,8 +19,8 @@ One of the goals of this project is to leverage Infrastructure as Code (IaC) as 
     - Deploy the source of this repository to S3.
 6. Once the source is deployed, we have an simple HTTP website which was mostly created using IaC.
 
-> **Note**
-Though I understand the reasoning for leveraging CodeStar connections, I dislike them because there is no way to complete the connection without going to your web browser and using [ClickOps](https://docs.cloudposse.com/glossary/clickops/). When working with the cloud, any process which _requires_ interaction with web console is a failed process.  In this case, it isn't entirely the fault of AWS, but it is still a failure.
+> [!NOTE]
+> Though I understand the reasoning for leveraging CodeStar connections, I dislike them because there is no way to complete the connection without going to your web browser and using [ClickOps](https://docs.cloudposse.com/glossary/clickops/). When working with the cloud, any process which _requires_ interaction with web console is a failed process.  In this case, it isn't entirely the fault of AWS, but it is still a failure.
 
 ## Outcome
 
@@ -28,8 +30,8 @@ Here is the [live demo website](http://ngamradt-demo-website-us-east-2.s3-websit
 
 Follow these steps in the exact order, and you should be good-to-go.
 
-> **Note**
-To keep things simple, we will be running some of these templates using the AWS Console and some basic [ClickOps](https://docs.cloudposse.com/glossary/clickops/) to run the templates in the CloudFormation console.  You could also use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) to run these templates, but we won't be covering that for now.
+> [!NOTE]
+> To keep things simple, we will be running some of these templates using the AWS Console and some basic ClickOps to run the templates in the CloudFormation console.  You could also use the [AWS CLI](https://aws.amazon.com/cli/) to run these templates, but we won't be covering that for now.
 
 1. Make your own local copy of this repository using the ["Use this template" button](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
 2. Log into your [GitHub account](https://github.com).
